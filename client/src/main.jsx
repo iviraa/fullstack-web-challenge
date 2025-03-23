@@ -7,15 +7,28 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
+    mode: "light",
     primary: {
-      main: "#1976d2",
+      main: "#8b5cf6",
     },
     secondary: {
-      main: "#ff9800",
+      main: "#a78bfa",
+    },
+    background: {
+      default: "#a78bfa",
     },
   },
   typography: {
-    fontFamily: "Poppins, sans-serif",
+    fontFamily: "Montserrat, Inter, Roboto, sans-serif",
+    h4: {
+      fontWeight: 700,
+    },
+    h5: {
+      fontWeight: 600,
+    },
+  },
+  shape: {
+    borderRadius: 8,
   },
 });
 

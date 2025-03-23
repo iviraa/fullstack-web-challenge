@@ -12,7 +12,6 @@ import {
 const TaskForm = ({ task, onSubmit, onClose }) => {
   const [form, setForm] = useState({ title: "", description: "" });
 
-  // Populate form with task data when editing an existing task
   useEffect(() => {
     if (task) {
       setForm({ title: task.title, description: task.description });
@@ -26,9 +25,9 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
   };
 
   const handleSubmit = () => {
-    // Basic validation: Ensure the title is not empty
+   
     if (form.title.trim() === "") return;
-    // If editing, include the task id; otherwise, pass form data as is
+ 
     onSubmit(task ? { ...task, ...form } : form);
   };
 

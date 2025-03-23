@@ -1,111 +1,208 @@
 import React, { useState } from "react";
 import {
+  Box,
   Container,
   Typography,
-  Paper,
   Stack,
+  Button,
+  TextField,
+  Paper,
+  IconButton,
+  Tabs,
+  Tab,
   List,
   ListItem,
   ListItemText,
-  IconButton,
-  Button,
+  InputAdornment,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
-import TaskForm from "./TaskForm.jsx";
+import DeleteIcon from "@mui/icons-material/Delete";
+import TaskForm from "./TaskForm";
 
 const Home = () => {
-  const [tasks, setTasks] = useState([]);
-  const [editingTask, setEditingTask] = useState(null);
+  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState(0);
+  const [tasks, setTasks] = useState([
+    {
+      id: 1,
+      title: "Finish project report",
+      description: "Due tomorrow",
+      updatedAt: "Mar 18, 2025",
+      completed: false,
+    },
+    {
+      id: 2,
+      title: "Buy groceries",
+      description: "",
+      updatedAt: "Mar 21, 2025",
+      completed: true,
+    },
+  ]);
   const [openForm, setOpenForm] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
 
-  // Open the TaskForm for adding a new task
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
+  const filteredTasks = tasks.filter((task) => {
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    if (activeTab === 1) return matchesSearch && !task.completed;
+    if (activeTab === 2) return matchesSearch && task.completed;
+    return matchesSearch;
+  });
+
   const handleAddTask = () => {
     setEditingTask(null);
     setOpenForm(true);
   };
 
-  // Open the TaskForm for editing an existing task
   const handleEditTask = (task) => {
     setEditingTask(task);
     setOpenForm(true);
   };
 
-  // Remove a task from the list
   const handleDeleteTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
+    setTasks(tasks.filter((t) => t.id !== id));
   };
 
-  // Handle form submission for both adding and editing tasks
-  const handleFormSubmit = (task) => {
+  const handleTaskFormSubmit = (task) => {
     if (editingTask) {
       setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
     } else {
-      setTasks([...tasks, { ...task, id: Date.now() }]);
+      setTasks([
+        ...tasks,
+        { ...task, id: Date.now(), updatedAt: new Date().toDateString() },
+      ]);
     }
     setOpenForm(false);
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 10 }}>
-      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-        <Stack spacing={3}>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
+    <>
+      {/* Header */}
+      <Container maxWidth="false" sx={{ py: 4 }}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={3}
+        >
+          <Box>
+            <Typography variant="h5" fontWeight={700} gutterBottom>
+              Welcome, Chetan!
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Here’s your overview for today.
+            </Typography>
+          </Box>
+          <Button variant="contained" onClick={handleAddTask}>
+            + Add Task
+          </Button>
+        </Stack>
+
+        {/* Search and Filter */}
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
+          {/* Tabs on the left */}
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            textColor="primary"
+            indicatorColor="primary"
           >
-            <Typography variant="h4" sx={{ fontWeight: 600 }}>
-              My To-Do List
-            </Typography>
-            <Button variant="contained" onClick={handleAddTask}>
-              Add Task
-            </Button>
-          </Stack>
-          {tasks.length === 0 ? (
-            <Typography variant="body1" align="center">
-              No tasks yet. Click "Add Task" to get started.
-            </Typography>
-          ) : (
-            <List>
-              {tasks.map((task) => (
+            <Tab label="All" disableRipple />
+            <Tab label="Active" disableRipple />
+            <Tab label="Completed" disableRipple />
+          </Tabs>
+
+          {/* Search bar on the right with icon inside */}
+          <Box sx={{ maxWidth: 300, width: "100%" }}>
+            <TextField
+              placeholder="Search tasks..."
+              variant="outlined"
+              size="small"
+              fullWidth
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+        </Stack>
+
+        {/* Task List */}
+        <Stack spacing={2}>
+          {filteredTasks.map((task) => (
+            <Paper key={task.id} sx={{ p: 2, borderRadius: 3 }} elevation={1}>
+              <List disablePadding>
                 <ListItem
-                  key={task.id}
                   secondaryAction={
                     <Stack direction="row" spacing={1}>
-                      <IconButton
-                        edge="end"
-                        onClick={() => handleEditTask(task)}
-                      >
+                      <IconButton onClick={() => handleEditTask(task)}>
                         <EditIcon />
                       </IconButton>
-                      <IconButton
-                        edge="end"
-                        onClick={() => handleDeleteTask(task.id)}
-                      >
+                      <IconButton onClick={() => handleDeleteTask(task.id)}>
                         <DeleteIcon />
                       </IconButton>
                     </Stack>
                   }
                 >
                   <ListItemText
-                    primary={task.title}
-                    secondary={task.description}
+                    primary={
+                      <Typography variant="subtitle1" fontWeight={600}>
+                        {task.title}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          component="span"
+                          sx={{ display: "block" }}
+                        >
+                          {task.description || "No description"}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          component="span"
+                          sx={{ display: "block" }}
+                        >
+                          {task.updatedAt}
+                        </Typography>
+                      </>
+                    }
                   />
                 </ListItem>
-              ))}
-            </List>
-          )}
+              </List>
+            </Paper>
+          ))}
         </Stack>
-      </Paper>
+      </Container>
+
+      {/* Task Form Dialog */}
       {openForm && (
         <TaskForm
           task={editingTask}
-          onSubmit={handleFormSubmit}
+          onSubmit={handleTaskFormSubmit}
           onClose={() => setOpenForm(false)}
         />
       )}
-    </Container>
+    </>
   );
 };
 
