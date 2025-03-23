@@ -52,7 +52,7 @@ router.put("/:id", auth, async (req, res) => {
 // Delete task : DELETE /api/tasks/:id
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const task = await Task.findOneAndRemove({
+    const task = await Task.findOneAndDelete({
       _id: req.params.id,
       userId: req.user.id,
     });
