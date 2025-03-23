@@ -22,10 +22,18 @@ mongoose
   .then(() => console.log("Connected to DB"))
   .catch((err) => console.log(err));
 
-//Test Route
-app.get("/", (req, res) => {
+//Routes
+const authRoutes = require("./routes/auth");
+const taskRoutes = require("./routes/tasks");
+
+app.use("/api", authRoutes);
+app.use("/api/tasks", taskRoutes);
+
+/*
+  app.get("/", (req, res) => {
   res.send("API is working");
 });
+*/
 
 //Initialize Server on port
 const PORT = process.env.PORT || 5000;
