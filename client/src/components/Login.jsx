@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   Container,
   TextField,
@@ -8,19 +8,50 @@ import {
   Stack,
   Link as MuiLink,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useContext(AuthContext); 
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Login:", form);
+    if (!form.email) {
+      setError("Email is required.");
+      return;
+    }
+    if (!form.password) {
+      setError("Password is required.");
+      return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/login", {
+        email: form.email,
+        password: form.password,
+      });
+      const token = response.data.token;
+
+      localStorage.setItem("token", token);
+
+      console.log("Login response:", response.data);
+      login(token, response.data.user);
+      console.log("Login successful, token stored via AuthProvider");
+      navigate("/");
+    } catch (err) {
+      console.error("Login error:", err);
+      setError(err.response?.data?.message || "Login failed. Please check your credentials.");
+    }
   };
 
   return (
@@ -36,9 +67,15 @@ const Login = () => {
         <Typography variant="h4" gutterBottom>
           Welcome Back
         </Typography>
-        <Typography variant="body2" color="text.secondary" mb={3}>
-          Log in to your account.
-        </Typography>
+        {error ? (
+          <Typography variant="body2" color="error" mb={3}>
+            {error}
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="text.secondary" mb={3}>
+            Log in to your account.
+          </Typography>
+        )}
         <form onSubmit={handleSubmit}>
           <Stack spacing={2} mb={3}>
             <TextField

@@ -10,9 +10,11 @@ import {
   InputAdornment,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/Check";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -21,14 +23,15 @@ const Register = () => {
   });
   const [error, setError] = useState("");
 
-  // Validation checks for the password
+  // Validation checks for the password:
+  // Must be at least 6 characters and include a number, a special character, and an uppercase letter.
   const isPasswordValid =
     form.password.length >= 6 &&
     /[0-9]/.test(form.password) &&
     /[!@#$%^&*(),.?":{}|<>]/.test(form.password) &&
     /[A-Z]/.test(form.password);
 
-  // Check if confirm password matches password
+  // Check if confirm password matches password.
   const isConfirmValid =
     form.confirmPassword && form.confirmPassword === form.password;
 
@@ -40,16 +43,42 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Client-side validation before calling API
+    // Validate required fields.
+    if (!form.username) {
+      setError("Username is required.");
+      return;
+    }
+    if (!form.email) {
+      setError("Email is required.");
+      return;
+    }
     if (!isPasswordValid) {
       setError(
-        "Password must be at least 6 characters long and include a number, a special character, and an uppercase letter."
+        "Password must be at least 6 characters and include a number, special char, and uppercase letter."
       );
       return;
     }
     if (!isConfirmValid) {
       setError("Passwords do not match.");
       return;
+    }
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/register", {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      });
+      const token = response.data.token;
+
+      console.log(
+        "Registration successful, token stored in localStorage:",
+        token
+      );
+      navigate("/login");
+    } catch (err) {
+      console.error("Error during registration:", err);
+      setError(err.response?.data?.message || "Registration failed.");
     }
   };
 
@@ -66,9 +95,15 @@ const Register = () => {
         <Typography variant="h4" gutterBottom>
           Create an Account
         </Typography>
-        <Typography variant="body2" color="text.secondary" mb={3}>
-          Enter your details to sign up.
-        </Typography>
+        {error ? (
+          <Typography variant="body2" color="error" mb={3}>
+            {error}
+          </Typography>
+        ) : (
+          <Typography variant="body2" color="text.secondary" mb={3}>
+            Enter your details to sign up.
+          </Typography>
+        )}
         <form onSubmit={handleSubmit}>
           <Stack spacing={2} mb={3}>
             <TextField
@@ -96,12 +131,12 @@ const Register = () => {
               variant="outlined"
               value={form.password}
               onChange={handleChange}
-              slotProps={{
-                endAdornment: isConfirmValid ? (
+              InputProps={{
+                endAdornment: isPasswordValid && (
                   <InputAdornment position="end">
                     <CheckCircleIcon color="success" />
                   </InputAdornment>
-                ) : null,
+                ),
               }}
             />
             <TextField
@@ -112,12 +147,12 @@ const Register = () => {
               variant="outlined"
               value={form.confirmPassword}
               onChange={handleChange}
-              slotProps={{
-                endAdornment: isConfirmValid ? (
+              InputProps={{
+                endAdornment: isConfirmValid && (
                   <InputAdornment position="end">
                     <CheckCircleIcon color="success" />
                   </InputAdornment>
-                ) : null,
+                ),
               }}
             />
           </Stack>

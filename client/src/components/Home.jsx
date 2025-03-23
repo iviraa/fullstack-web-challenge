@@ -19,8 +19,14 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TaskForm from "./TaskForm";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Home = () => {
+  const { isAuth } = useContext(AuthContext);
+  const user = isAuth.user;
+  console.log("User:", user);
+
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState(0);
   const [tasks, setTasks] = useState([
@@ -93,7 +99,7 @@ const Home = () => {
         >
           <Box>
             <Typography variant="h5" fontWeight={700} gutterBottom>
-              Welcome, Chetan!
+              Welcome, {user.username}!
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Here’s your overview for today.

@@ -7,6 +7,7 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import "./App.css";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   return (
@@ -15,9 +16,11 @@ function App() {
         <Route
           path="/"
           element={
-            <Layout>
-              <Home />
-            </Layout>
+            <ProtectedRoute>
+              <Layout>
+                <Home />
+              </Layout>
+            </ProtectedRoute>
           }
         />
         <Route path="/login" element={<Login />} />

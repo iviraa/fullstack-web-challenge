@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -14,10 +14,16 @@ import {
 import LogoutIcon from "@mui/icons-material/Logout";
 import PersonIcon from "@mui/icons-material/Person";
 import HamburgerIcon from "@mui/icons-material/Menu";
+import { AuthContext } from "../context/AuthContext";
 
 const NavBar = () => {
-  const userName = "fffff";
-  const userEmail = "fff@f.com";
+  const { isAuth, logout } = useContext(AuthContext);
+
+  const user = isAuth.user;
+
+  console.log("User:", user);
+  const userName = user ? user.username : "";
+  const userEmail = user ? user.email : "";
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -32,6 +38,7 @@ const NavBar = () => {
 
   const handleLogout = () => {
     console.log("Logging out...");
+    logout();
     handleCloseMenu();
   };
 
