@@ -23,27 +23,27 @@ const Register = () => {
   });
   const [error, setError] = useState("");
 
-  // Validation checks for the password:
-  // Must be at least 6 characters and include a number, a special character, and an uppercase letter.
+  // Check if password is strong
   const isPasswordValid =
     form.password.length >= 6 &&
     /[0-9]/.test(form.password) &&
     /[!@#$%^&*(),.?":{}|<>]/.test(form.password) &&
     /[A-Z]/.test(form.password);
 
-  // Check if confirm password matches password.
+  // Check if confirm password matches
   const isConfirmValid =
     form.confirmPassword && form.confirmPassword === form.password;
 
+  // Update form values
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate required fields.
     if (!form.username) {
       setError("Username is required.");
       return;
@@ -64,20 +64,13 @@ const Register = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/register", {
+      await axios.post("http://localhost:5000/api/register", {
         username: form.username,
         email: form.email,
         password: form.password,
       });
-      const token = response.data.token;
-
-      console.log(
-        "Registration successful, token stored in localStorage:",
-        token
-      );
       navigate("/login");
     } catch (err) {
-      console.error("Error during registration:", err);
       setError(err.response?.data?.message || "Registration failed.");
     }
   };

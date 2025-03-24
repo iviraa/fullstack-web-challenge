@@ -6,6 +6,7 @@ import { AuthContext } from "../context/AuthContext";
 const ProtectedRoute = ({ children }) => {
   const { isAuth, loading } = useContext(AuthContext);
 
+  // Show loader while checking auth
   if (loading)
     return (
       <Box
@@ -16,12 +17,14 @@ const ProtectedRoute = ({ children }) => {
           height: "100vh",
         }}
       >
-        <CircularProgress sx={{ color: "purple" }} />
+        <CircularProgress sx={{ color: "primary" }} />
       </Box>
     );
 
+  // Redirect to login if not authenticated
   if (!isAuth.token) return <Navigate to="/login" />;
 
+  // Render child components if authenticated
   return children;
 };
 

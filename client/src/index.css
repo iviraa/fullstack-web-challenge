@@ -1,16 +1,16 @@
-
+/* Reset margins, padding, and box sizing */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-
+/* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-
+/* Body font and color settings */
 body {
   font-family: "Montserrat", Roboto, sans-serif;
   color: #333;
@@ -19,6 +19,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Full height and background color */
 html,
 body {
   height: 100%;
@@ -26,14 +27,14 @@ body {
   scrollbar-width: none;
 }
 
-
+/* Root element with flex layout */
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-
+/* Remove link underline */
 a {
   text-decoration: none;
   color: inherit;

@@ -3,19 +3,16 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  console.log("AuthProvider rendered");
+  // State for loading and authentication
   const [loading, setLoading] = useState(true);
-
   const [isAuth, setIsAuth] = useState({ token: null, user: null });
 
-  // Check for token and Validate on Mount
+  // Check and validate token on mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
-   
     const user = storedUser ? JSON.parse(storedUser) : null;
 
-    console.log("Retrieved token:", token);
     if (token) {
       setIsAuth({ token, user });
     } else {
@@ -25,18 +22,17 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // Save token and user on login
   const login = (token, user) => {
-    console.log("Logging in...");
-    localStorage.setItem("token", token);
-    console.log("User persist:", user);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("tasks:token", token);
+    localStorage.setItem("tasks:user", JSON.stringify(user));
     setIsAuth({ token, user });
   };
 
+  // Clear token and user on logout
   const logout = () => {
-    console.log("Logging out...");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("tasks:token");
+    localStorage.removeItem("tasks:user");
     setIsAuth({ token: null, user: null });
   };
 

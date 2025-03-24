@@ -1,13 +1,13 @@
 import React from "react";
 import NavBar from "./NavBar";
-import "./Layout.css"; 
+import "./Layout.css";
 
 const Layout = ({ children }) => {
   return (
     <>
-      {/* Full-width navbar */}
+      {/* Top navigation bar */}
       <NavBar />
-      {/* Centered content area */}
+      {/* Page content */}
       <div className="main-content">
         {children}
       </div>

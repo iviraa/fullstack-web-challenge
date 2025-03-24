@@ -11,8 +11,10 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
   return (
+    // Provide auth context to the app
     <AuthProvider>
       <Routes>
+        {/* Protected home route */}
         <Route
           path="/"
           element={
@@ -23,6 +25,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Public routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

@@ -19,26 +19,25 @@ import { AuthContext } from "../context/AuthContext";
 
 const NavBar = () => {
   const { isAuth, logout } = useContext(AuthContext);
-
   const user = isAuth.user;
-
-  console.log("User:", user);
   const userName = user ? user.username : "";
   const userEmail = user ? user.email : "";
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
+  // Open dropdown menu
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  // Close dropdown menu
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
 
+  // Logout user
   const handleLogout = () => {
-    console.log("Logging out...");
     logout();
     handleCloseMenu();
   };
@@ -57,14 +56,12 @@ const NavBar = () => {
 
         <Box sx={{ flexGrow: 1 }} />
 
+        {/* Menu icon */}
         <IconButton onClick={handleOpenMenu} sx={{ p: 0 }}>
-          <HamburgerIcon
-            alt={userName}
-            sx={{ width: 48, height: 48, padding: 1 }}
-          />
+          <HamburgerIcon sx={{ width: 48, height: 48, padding: 1 }} />
         </IconButton>
 
-        {/* Dropdown Menu */}
+        {/* Dropdown menu */}
         <Menu
           anchorEl={anchorEl}
           open={open}
@@ -91,7 +88,6 @@ const NavBar = () => {
           <Divider sx={{ my: 1 }} />
           <MenuItem
             onClick={handleLogout}
-            color="error"
             sx={{ color: (theme) => theme.palette.error.main }}
           >
             <ListItemIcon>

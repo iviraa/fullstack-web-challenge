@@ -17,6 +17,7 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
   const { isAuth } = useContext(AuthContext);
   const [form, setForm] = useState({ title: "", description: "" });
 
+  // Set form values if editing a task
   useEffect(() => {
     if (task) {
       setForm({ title: task.title, description: task.description });
@@ -25,10 +26,12 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
     }
   }, [task]);
 
+  // Update form fields
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Save or update task
   const handleSubmit = async () => {
     if (form.title.trim() === "") return;
 
@@ -39,6 +42,7 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
           Authorization: `Bearer ${isAuth.token}`,
         },
       };
+
       if (task) {
         response = await axios.put(
           `http://localhost:5000/api/tasks/${task._id}`,
@@ -52,8 +56,8 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
           config
         );
       }
+
       onSubmit(task ? { ...task, ...form } : response.data);
-      console.log("Task saved successfully:", response.data);
     } catch (err) {
       console.error("Error saving task:", err);
     }

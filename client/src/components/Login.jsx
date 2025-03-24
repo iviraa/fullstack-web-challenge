@@ -14,15 +14,17 @@ import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext); 
+  const { login } = useContext(AuthContext);
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
+  // Update form values
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
+  // Send login request
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -41,15 +43,10 @@ const Login = () => {
         password: form.password,
       });
       const token = response.data.token;
-
-      localStorage.setItem("token", token);
-
-      console.log("Login response:", response.data);
+      localStorage.setItem("tasks:token", token);
       login(token, response.data.user);
-      console.log("Login successful, token stored via AuthProvider");
       navigate("/");
     } catch (err) {
-      console.error("Login error:", err);
       setError(err.response?.data?.message || "Login failed. Please check your credentials.");
     }
   };

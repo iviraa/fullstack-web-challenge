@@ -26,8 +26,7 @@ import { AuthContext } from "../context/AuthContext";
 const Home = () => {
   const { isAuth } = useContext(AuthContext);
   const user = isAuth.user;
-  const token = isAuth.token; 
-  console.log("User:", user);
+  const token = isAuth.token;
 
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState(0);
@@ -35,35 +34,29 @@ const Home = () => {
   const [openForm, setOpenForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
+  // Get tasks from the server
   const fetchTasks = async () => {
     if (token) {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/tasks",
-          config
-        );
+        const response = await axios.get("http://localhost:5000/api/tasks", config);
         setTasks(response.data);
-        console.log("Tasks retrieved successfully:", response.data);
       } catch (error) {
         console.error("Error retrieving tasks:", error);
       }
     }
   };
 
+  // Load tasks on mount or when token changes
   useEffect(() => {
     fetchTasks();
   }, [token]);
 
+  // Delete a task by id
   const handleDeleteTask = async (id) => {
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       await axios.delete(`http://localhost:5000/api/tasks/${id}`, config);
-      // Remove task from local state after deletion
       setTasks((prevTasks) =>
         prevTasks.filter((t) => {
           const currentId = t._id?.$oid || t._id || t.id;
@@ -75,20 +68,17 @@ const Home = () => {
     }
   };
 
-
+  // Toggle task completion
   const handleToggleCompleted = async (task) => {
     const updatedTask = { ...task, completed: !task.completed };
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       const taskId = task._id?.$oid || task._id || task.id;
       const response = await axios.put(
         `http://localhost:5000/api/tasks/${taskId}`,
         updatedTask,
         config
       );
-      // Update local state with the updated task
       setTasks((prevTasks) =>
         prevTasks.map((t) => {
           const currentId = t._id;
@@ -100,30 +90,32 @@ const Home = () => {
     }
   };
 
+  // Change active tab
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  // Filter tasks based on active tab and search query.
+  // Filter tasks based on search and tab
   const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = task.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
+    const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase());
     if (activeTab === 1) return matchesSearch && !task.completed;
     if (activeTab === 2) return matchesSearch && task.completed;
     return matchesSearch;
   });
 
+  // Open form for adding a new task
   const handleAddTask = () => {
     setEditingTask(null);
     setOpenForm(true);
   };
 
+  // Open form for editing an existing task
   const handleEditTask = (task) => {
     setEditingTask(task);
     setOpenForm(true);
   };
 
+  // Refresh tasks after form submission
   const handleTaskFormSubmit = (task) => {
     setOpenForm(false);
     fetchTasks();
@@ -133,12 +125,7 @@ const Home = () => {
     <>
       {/* Header */}
       <Container maxWidth="false" sx={{ py: 4 }}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={3}
-        >
+        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
           <Box>
             <Typography variant="h5" fontWeight={700} gutterBottom>
               Welcome, {user?.username || "User"}!
@@ -152,13 +139,8 @@ const Home = () => {
           </Button>
         </Stack>
 
-        {/* Search and Filter */}
-        <Stack
-          direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={2}
-        >
+        {/* Search and filter */}
+        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -188,7 +170,7 @@ const Home = () => {
           </Box>
         </Stack>
 
-        {/* Task List */}
+        {/* Task list */}
         <Stack spacing={2}>
           {filteredTasks.map((task) => {
             const taskId = task._id?.$oid || task._id || task.id;
@@ -199,10 +181,10 @@ const Home = () => {
                     secondaryAction={
                       <Stack direction="row" spacing={1}>
                         <IconButton onClick={() => handleEditTask(task)}>
-                          <EditIcon color="primary"/>
+                          <EditIcon color="primary" />
                         </IconButton>
                         <IconButton onClick={() => handleDeleteTask(taskId)}>
-                          <DeleteIcon color="error"  />
+                          <DeleteIcon color="error" />
                         </IconButton>
                       </Stack>
                     }
@@ -220,27 +202,14 @@ const Home = () => {
                       }
                       secondary={
                         <>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            component="span"
-                            sx={{ display: "block" }}
-                          >
+                          <Typography variant="body2" color="text.secondary" component="span" sx={{ display: "block" }}>
                             {task.description || "No description"}
                           </Typography>
-                          <Typography
-                            variant="caption"
-                            color="text.disabled"
-                            component="span"
-                            sx={{ display: "block" }}
-                          >
-                            {new Date(task.updatedAt).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )}
+                          <Typography variant="caption" color="text.disabled" component="span" sx={{ display: "block" }}>
+                            {new Date(task.updatedAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}
                           </Typography>
                         </>
                       }
@@ -253,7 +222,7 @@ const Home = () => {
         </Stack>
       </Container>
 
-      {/* Task Form Dialog */}
+      {/* Task form */}
       {openForm && (
         <TaskForm
           task={editingTask}

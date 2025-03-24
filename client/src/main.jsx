@@ -5,29 +5,29 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-
+// Custom MUI theme configuration
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#333333", 
+      main: "#333333",
     },
     secondary: {
-      main: "#F7F7F7", 
+      main: "#F7F7F7",
     },
     background: {
-      default: "#ffffff", 
-      paper: "#f7f7f7",   
+      default: "#ffffff",
+      paper: "#f7f7f7",
     },
     text: {
-      primary: "#333333", 
+      primary: "#333333",
       secondary: "#666666",
     },
     success: {
-      main: "#34d399", 
+      main: "#34d399",
     },
     error: {
-      main: "#f87171", 
+      main: "#f87171",
     },
   },
   typography: {
@@ -44,8 +44,7 @@ const theme = createTheme({
   },
 });
 
-
-
+// Render root component of React App
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
