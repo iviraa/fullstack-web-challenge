@@ -59,8 +59,8 @@ const NavBar = () => {
         <IconButton onClick={handleOpenMenu} sx={{ p: 0 }}>
           <HamburgerIcon
             alt={userName}
-            sx={{ width: 40, height: 40, padding: 1 }}
-            color="secondary"
+            sx={{ width: 48, height: 48, padding: 1 }}
+
           />
         </IconButton>
 
