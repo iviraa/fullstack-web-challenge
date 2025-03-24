@@ -13,6 +13,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 
+const baseUrl = import.meta.env.VITE_PUBLIC_URL;
+
 const TaskForm = ({ task, onSubmit, onClose }) => {
   const { isAuth } = useContext(AuthContext);
   const [form, setForm] = useState({ title: "", description: "" });
@@ -45,16 +47,12 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
 
       if (task) {
         response = await axios.put(
-          `http://localhost:5000/api/tasks/${task._id}`,
+          `${baseUrl}/api/tasks/${task._id}`,
           form,
           config
         );
       } else {
-        response = await axios.post(
-          "http://localhost:5000/api/tasks",
-          form,
-          config
-        );
+        response = await axios.post(`${baseUrl}/api/tasks`, form, config);
       }
 
       onSubmit(task ? { ...task, ...form } : response.data);

@@ -23,6 +23,8 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import TaskForm from "./TaskForm";
 import { AuthContext } from "../context/AuthContext";
 
+const baseUrl = import.meta.env.VITE_PUBLIC_URL;
+
 const Home = () => {
   const { isAuth } = useContext(AuthContext);
   const user = isAuth.user;
@@ -39,7 +41,7 @@ const Home = () => {
     if (token) {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       try {
-        const response = await axios.get("http://localhost:5000/api/tasks", config);
+        const response = await axios.get(`${baseUrl}/api/tasks`, config);
         setTasks(response.data);
       } catch (error) {
         console.error("Error retrieving tasks:", error);
@@ -56,7 +58,7 @@ const Home = () => {
   const handleDeleteTask = async (id) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`, config);
+      await axios.delete(`${baseUrl}/api/tasks/${id}`, config);
       setTasks((prevTasks) =>
         prevTasks.filter((t) => {
           const currentId = t._id?.$oid || t._id || t.id;
@@ -75,7 +77,7 @@ const Home = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const taskId = task._id?.$oid || task._id || task.id;
       const response = await axios.put(
-        `http://localhost:5000/api/tasks/${taskId}`,
+        `${baseUrl}/api/tasks/${taskId}`,
         updatedTask,
         config
       );
@@ -97,7 +99,9 @@ const Home = () => {
 
   // Filter tasks based on search and tab
   const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = task.title.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(search.toLowerCase());
     if (activeTab === 1) return matchesSearch && !task.completed;
     if (activeTab === 2) return matchesSearch && task.completed;
     return matchesSearch;
@@ -125,13 +129,18 @@ const Home = () => {
     <>
       {/* Header */}
       <Container maxWidth="false" sx={{ py: 4 }}>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={3}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={3}
+        >
           <Box>
             <Typography variant="h5" fontWeight={700} gutterBottom>
               Welcome, {user?.username || "User"}!
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Here’s your overview for today.
+              Here's your overview for today.
             </Typography>
           </Box>
           <Button variant="contained" onClick={handleAddTask}>
@@ -140,7 +149,12 @@ const Home = () => {
         </Stack>
 
         {/* Search and filter */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -202,14 +216,27 @@ const Home = () => {
                       }
                       secondary={
                         <>
-                          <Typography variant="body2" color="text.secondary" component="span" sx={{ display: "block" }}>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            component="span"
+                            sx={{ display: "block" }}
+                          >
                             {task.description || "No description"}
                           </Typography>
-                          <Typography variant="caption" color="text.disabled" component="span" sx={{ display: "block" }}>
-                            {new Date(task.updatedAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
+                          <Typography
+                            variant="caption"
+                            color="text.disabled"
+                            component="span"
+                            sx={{ display: "block" }}
+                          >
+                            {new Date(task.updatedAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
                           </Typography>
                         </>
                       }

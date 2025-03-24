@@ -13,6 +13,8 @@ import CheckCircleIcon from "@mui/icons-material/Check";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const baseUrl = import.meta.env.VITE_PUBLIC_URL;
+
 const Register = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -64,7 +66,7 @@ const Register = () => {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/register", {
+      await axios.post(`${baseUrl}/api/register`, {
         username: form.username,
         email: form.email,
         password: form.password,
