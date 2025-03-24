@@ -9,8 +9,8 @@ export const AuthProvider = ({ children }) => {
 
   // Check and validate token on mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("tasks:token");
+    const storedUser = localStorage.getItem("tasks:user");
     const user = storedUser ? JSON.parse(storedUser) : null;
 
     if (token) {
