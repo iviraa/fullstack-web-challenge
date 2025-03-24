@@ -5,17 +5,29 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
+
 const theme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#8b5cf6",
+      main: "#333333", 
     },
     secondary: {
-      main: "#a78bfa",
+      main: "#F7F7F7", 
     },
     background: {
-      default: "#a78bfa",
+      default: "#ffffff", 
+      paper: "#f7f7f7",   
+    },
+    text: {
+      primary: "#333333", 
+      secondary: "#666666",
+    },
+    success: {
+      main: "#34d399", 
+    },
+    error: {
+      main: "#f87171", 
     },
   },
   typography: {
@@ -31,6 +43,8 @@ const theme = createTheme({
     borderRadius: 8,
   },
 });
+
+
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

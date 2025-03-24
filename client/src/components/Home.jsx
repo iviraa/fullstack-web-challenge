@@ -18,15 +18,15 @@ import {
   Checkbox,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import TaskForm from "./TaskForm";
 import { AuthContext } from "../context/AuthContext";
 
 const Home = () => {
   const { isAuth } = useContext(AuthContext);
   const user = isAuth.user;
-  const token = isAuth.token; // token used for authorization
+  const token = isAuth.token; 
   console.log("User:", user);
 
   const [search, setSearch] = useState("");
@@ -35,7 +35,6 @@ const Home = () => {
   const [openForm, setOpenForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
 
-  // Function to fetch tasks from API
   const fetchTasks = async () => {
     if (token) {
       const config = {
@@ -54,12 +53,10 @@ const Home = () => {
     }
   };
 
-  // Initial fetch of tasks on component mount
   useEffect(() => {
     fetchTasks();
   }, [token]);
 
-  // Delete task by id using API call
   const handleDeleteTask = async (id) => {
     try {
       const config = {
@@ -78,7 +75,7 @@ const Home = () => {
     }
   };
 
-  // Toggle task completed status and update via API
+
   const handleToggleCompleted = async (task) => {
     const updatedTask = { ...task, completed: !task.completed };
     try {
@@ -202,10 +199,10 @@ const Home = () => {
                     secondaryAction={
                       <Stack direction="row" spacing={1}>
                         <IconButton onClick={() => handleEditTask(task)}>
-                          <EditIcon />
+                          <EditIcon color="primary"/>
                         </IconButton>
                         <IconButton onClick={() => handleDeleteTask(taskId)}>
-                          <DeleteIcon />
+                          <DeleteIcon color="error"  />
                         </IconButton>
                       </Stack>
                     }

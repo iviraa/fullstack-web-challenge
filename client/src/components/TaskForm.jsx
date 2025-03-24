@@ -1,5 +1,4 @@
-// src/components/TaskForm.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,9 +6,11 @@ import {
   TextField,
   DialogActions,
   Button,
+  Box,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/DownloadDoneOutlined";
+import EditIcon from "@mui/icons-material/Edit";
 import axios from "axios";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const TaskForm = ({ task, onSubmit, onClose }) => {
@@ -33,7 +34,7 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
 
     try {
       let response;
-      let config = {
+      const config = {
         headers: {
           Authorization: `Bearer ${isAuth.token}`,
         },
@@ -51,7 +52,7 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
           config
         );
       }
-      onSubmit(task ? { ...task, ...form } : form);
+      onSubmit(task ? { ...task, ...form } : response.data);
       console.log("Task saved successfully:", response.data);
     } catch (err) {
       console.error("Error saving task:", err);
@@ -60,37 +61,52 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
 
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{task ? "Edit Task" : "Add New Task"}</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          name="title"
-          label="Title"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={form.title}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          name="description"
-          label="Description"
-          type="text"
-          fullWidth
-          variant="outlined"
-          multiline
-          rows={3}
-          value={form.description}
-          onChange={handleChange}
-        />
+      <DialogTitle sx={{ px: 3, py: 2, fontSize: "1.25rem", fontWeight: 600 }}>
+        {task ? "Edit Task" : "Add New Task"}
+      </DialogTitle>
+      <DialogContent sx={{ px: 3, py: 2 }}>
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="title"
+            label="Title"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={form.title}
+            onChange={handleChange}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            margin="dense"
+            name="description"
+            label="Description"
+            type="text"
+            fullWidth
+            variant="outlined"
+            multiline
+            rows={3}
+            value={form.description}
+            onChange={handleChange}
+          />
+        </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant="text">
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="error"
+          sx={{ textTransform: "none" }}
+        >
           Cancel
         </Button>
-        <Button onClick={handleSubmit} variant="contained">
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          startIcon={task ? <EditIcon /> : <AddIcon />}
+          sx={{ textTransform: "none" }}
+        >
           {task ? "Update" : "Add"}
         </Button>
       </DialogActions>
