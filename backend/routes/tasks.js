@@ -17,11 +17,12 @@ router.get("/", auth, async (req, res) => {
 
 // Add new task : POST /api/tasks
 router.post("/", auth, async (req, res) => {
-  const { title } = req.body;
+  const { title, description } = req.body;
   try {
     const task = new Task({
       userId: req.user.id,
       title,
+      description,
     });
     await task.save();
     res.json(task);
@@ -33,12 +34,14 @@ router.post("/", auth, async (req, res) => {
 
 // Update task : PUT /api/tasks/:id
 router.put("/:id", auth, async (req, res) => {
-  const { title, completed } = req.body;
+  const { title, description, completed } = req.body;
   try {
     let task = await Task.findOne({ _id: req.params.id, userId: req.user.id });
     if (!task) return res.status(404).json({ msg: "Task not found" });
 
     task.title = title !== undefined ? title : task.title;
+    task.description =
+      description !== undefined ? description : task.description;
     task.completed = completed !== undefined ? completed : task.completed;
 
     task = await task.save();

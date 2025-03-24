@@ -8,8 +8,12 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import axios from "axios";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const TaskForm = ({ task, onSubmit, onClose }) => {
+  const { isAuth } = useContext(AuthContext);
   const [form, setForm] = useState({ title: "", description: "" });
 
   useEffect(() => {
@@ -24,11 +28,34 @@ const TaskForm = ({ task, onSubmit, onClose }) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = () => {
-   
+  const handleSubmit = async () => {
     if (form.title.trim() === "") return;
- 
-    onSubmit(task ? { ...task, ...form } : form);
+
+    try {
+      let response;
+      let config = {
+        headers: {
+          Authorization: `Bearer ${isAuth.token}`,
+        },
+      };
+      if (task) {
+        response = await axios.put(
+          `http://localhost:5000/api/tasks/${task._id}`,
+          form,
+          config
+        );
+      } else {
+        response = await axios.post(
+          "http://localhost:5000/api/tasks",
+          form,
+          config
+        );
+      }
+      onSubmit(task ? { ...task, ...form } : form);
+      console.log("Task saved successfully:", response.data);
+    } catch (err) {
+      console.error("Error saving task:", err);
+    }
   };
 
   return (

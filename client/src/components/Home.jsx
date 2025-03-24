@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import axios from "axios";
 import {
   Box,
   Container,
@@ -14,44 +15,99 @@ import {
   ListItem,
   ListItemText,
   InputAdornment,
+  Checkbox,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TaskForm from "./TaskForm";
-import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 
 const Home = () => {
   const { isAuth } = useContext(AuthContext);
   const user = isAuth.user;
+  const token = isAuth.token; // token used for authorization
   console.log("User:", user);
 
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState(0);
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Finish project report",
-      description: "Due tomorrow",
-      updatedAt: "Mar 18, 2025",
-      completed: false,
-    },
-    {
-      id: 2,
-      title: "Buy groceries",
-      description: "",
-      updatedAt: "Mar 21, 2025",
-      completed: true,
-    },
-  ]);
+  const [tasks, setTasks] = useState([]);
   const [openForm, setOpenForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+
+  // Function to fetch tasks from API
+  const fetchTasks = async () => {
+    if (token) {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/tasks",
+          config
+        );
+        setTasks(response.data);
+        console.log("Tasks retrieved successfully:", response.data);
+      } catch (error) {
+        console.error("Error retrieving tasks:", error);
+      }
+    }
+  };
+
+  // Initial fetch of tasks on component mount
+  useEffect(() => {
+    fetchTasks();
+  }, [token]);
+
+  // Delete task by id using API call
+  const handleDeleteTask = async (id) => {
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      await axios.delete(`http://localhost:5000/api/tasks/${id}`, config);
+      // Remove task from local state after deletion
+      setTasks((prevTasks) =>
+        prevTasks.filter((t) => {
+          const currentId = t._id?.$oid || t._id || t.id;
+          return currentId !== id;
+        })
+      );
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+
+  // Toggle task completed status and update via API
+  const handleToggleCompleted = async (task) => {
+    const updatedTask = { ...task, completed: !task.completed };
+    try {
+      const config = {
+        headers: { Authorization: `Bearer ${token}` },
+      };
+      const taskId = task._id?.$oid || task._id || task.id;
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/${taskId}`,
+        updatedTask,
+        config
+      );
+      // Update local state with the updated task
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => {
+          const currentId = t._id;
+          return currentId === taskId ? response.data : t;
+        })
+      );
+    } catch (error) {
+      console.error("Error updating task", error);
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
+  // Filter tasks based on active tab and search query.
   const filteredTasks = tasks.filter((task) => {
     const matchesSearch = task.title
       .toLowerCase()
@@ -71,20 +127,9 @@ const Home = () => {
     setOpenForm(true);
   };
 
-  const handleDeleteTask = (id) => {
-    setTasks(tasks.filter((t) => t.id !== id));
-  };
-
   const handleTaskFormSubmit = (task) => {
-    if (editingTask) {
-      setTasks(tasks.map((t) => (t.id === task.id ? task : t)));
-    } else {
-      setTasks([
-        ...tasks,
-        { ...task, id: Date.now(), updatedAt: new Date().toDateString() },
-      ]);
-    }
     setOpenForm(false);
+    fetchTasks();
   };
 
   return (
@@ -99,7 +144,7 @@ const Home = () => {
         >
           <Box>
             <Typography variant="h5" fontWeight={700} gutterBottom>
-              Welcome, {user.username}!
+              Welcome, {user?.username || "User"}!
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Here’s your overview for today.
@@ -117,7 +162,6 @@ const Home = () => {
           alignItems="center"
           mb={2}
         >
-          {/* Tabs on the left */}
           <Tabs
             value={activeTab}
             onChange={handleTabChange}
@@ -128,8 +172,6 @@ const Home = () => {
             <Tab label="Active" disableRipple />
             <Tab label="Completed" disableRipple />
           </Tabs>
-
-          {/* Search bar on the right with icon inside */}
           <Box sx={{ maxWidth: 300, width: "100%" }}>
             <TextField
               placeholder="Search tasks..."
@@ -151,52 +193,66 @@ const Home = () => {
 
         {/* Task List */}
         <Stack spacing={2}>
-          {filteredTasks.map((task) => (
-            <Paper key={task.id} sx={{ p: 2, borderRadius: 3 }} elevation={1}>
-              <List disablePadding>
-                <ListItem
-                  secondaryAction={
-                    <Stack direction="row" spacing={1}>
-                      <IconButton onClick={() => handleEditTask(task)}>
-                        <EditIcon />
-                      </IconButton>
-                      <IconButton onClick={() => handleDeleteTask(task.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </Stack>
-                  }
-                >
-                  <ListItemText
-                    primary={
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {task.title}
-                      </Typography>
+          {filteredTasks.map((task) => {
+            const taskId = task._id?.$oid || task._id || task.id;
+            return (
+              <Paper key={taskId} sx={{ p: 2, borderRadius: 3 }} elevation={1}>
+                <List disablePadding>
+                  <ListItem
+                    secondaryAction={
+                      <Stack direction="row" spacing={1}>
+                        <IconButton onClick={() => handleEditTask(task)}>
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteTask(taskId)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </Stack>
                     }
-                    secondary={
-                      <>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          component="span"
-                          sx={{ display: "block" }}
-                        >
-                          {task.description || "No description"}
+                  >
+                    <Checkbox
+                      checked={task.completed}
+                      onChange={() => handleToggleCompleted(task)}
+                    />
+                    <ListItemText
+                      sx={{ ml: 2 }}
+                      primary={
+                        <Typography variant="subtitle1" fontWeight={600}>
+                          {task.title}
                         </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.disabled"
-                          component="span"
-                          sx={{ display: "block" }}
-                        >
-                          {task.updatedAt}
-                        </Typography>
-                      </>
-                    }
-                  />
-                </ListItem>
-              </List>
-            </Paper>
-          ))}
+                      }
+                      secondary={
+                        <>
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            component="span"
+                            sx={{ display: "block" }}
+                          >
+                            {task.description || "No description"}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            color="text.disabled"
+                            component="span"
+                            sx={{ display: "block" }}
+                          >
+                            {new Date(task.updatedAt).toLocaleDateString(
+                              "en-US",
+                              {
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
+                          </Typography>
+                        </>
+                      }
+                    />
+                  </ListItem>
+                </List>
+              </Paper>
+            );
+          })}
         </Stack>
       </Container>
 
@@ -206,6 +262,7 @@ const Home = () => {
           task={editingTask}
           onSubmit={handleTaskFormSubmit}
           onClose={() => setOpenForm(false)}
+          token={token}
         />
       )}
     </>
